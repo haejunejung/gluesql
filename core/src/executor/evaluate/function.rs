@@ -302,6 +302,34 @@ pub fn replace<'a>(
     Continue(Evaluated::Value(Value::Str(value)))
 }
 
+pub fn hex<'a>(name: String, expr: Evaluated<'_>) -> ControlFlow<Evaluated<'a>> {
+    let hex_string = match expr.try_into().break_if_null()? {
+        Value::Str(s) => s
+            .as_bytes()
+            .iter()
+            .map(|b| format!("{:02X}", b))
+            .collect::<Vec<_>>()
+            .join(""),
+        Value::I8(i) => format!("{:X}", i),
+        Value::I16(i) => format!("{:X}", i),
+        Value::I32(i) => format!("{:X}", i),
+        Value::I64(i) => format!("{:X}", i),
+        Value::I128(i) => format!("{:X}", i),
+        Value::U8(i) => format!("{:X}", i),
+        Value::U16(i) => format!("{:X}", i),
+        Value::U32(i) => format!("{:X}", i),
+        Value::U64(i) => format!("{:X}", i),
+        Value::U128(i) => format!("{:X}", i),
+        Value::F32(f) => format!("{:X}", f as i64),
+        Value::F64(f) => format!("{:X}", f as i64),
+        _ => {
+            return Err(EvaluateError::FunctionRequiresStringValue(name).into())
+                .into_control_flow();
+        }
+    };
+    Continue(Evaluated::Value(Value::Str(hex_string)))
+}
+
 pub fn ascii<'a>(name: String, expr: Evaluated<'_>) -> ControlFlow<Evaluated<'a>> {
     let string = eval_to_str(&name, expr)?;
     let mut iter = string.chars();

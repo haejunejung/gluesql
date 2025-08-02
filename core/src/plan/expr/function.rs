@@ -47,6 +47,7 @@ impl Function {
             | Self::Sqrt(expr)
             | Self::Abs(expr)
             | Self::Sign(expr)
+            | Self::Hex(expr)
             | Self::Ascii(expr)
             | Self::Chr(expr)
             | Self::Md5(expr)
