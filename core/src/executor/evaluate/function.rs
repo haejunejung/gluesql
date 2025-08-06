@@ -8,6 +8,7 @@ use {
     chrono::{Datelike, Duration, Months},
     md5::{Digest, Md5},
     rand::{Rng, SeedableRng, rngs::StdRng},
+    rust_decimal::prelude::ToPrimitive,
     std::ops::ControlFlow::{self as StdControlFlow, Break, Continue},
     uuid::Uuid,
 };
@@ -322,6 +323,12 @@ pub fn hex<'a>(name: String, expr: Evaluated<'_>) -> ControlFlow<Evaluated<'a>> 
         Value::U128(i) => format!("{:X}", i),
         Value::F32(f) => format!("{:X}", f as i64),
         Value::F64(f) => format!("{:X}", f as i64),
+        Value::Decimal(d) => format!("{:X}", d.to_i64().unwrap_or(0)),
+        Value::Bytea(bytes) => bytes
+            .iter()
+            .map(|b| format!("{:02X}", b))
+            .collect::<Vec<_>>()
+            .join(""),
         _ => {
             return Err(EvaluateError::FunctionRequiresStringValue(name).into())
                 .into_control_flow();
